@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChoiceController;
 use App\Http\Controllers\QuestionController;
+use App\Http\Controllers\QuizAttemptController;
 use App\Http\Controllers\QuizController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -29,6 +30,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/quizzes/{quiz}/questions/{question}/choices/{choice}', [ChoiceController::class, 'show']);
     Route::match(['put', 'patch'], '/quizzes/{quiz}/questions/{question}/choices/{choice}', [ChoiceController::class, 'update']);
     Route::delete('/quizzes/{quiz}/questions/{question}/choices/{choice}', [ChoiceController::class, 'destroy']);
+
+    Route::post('/quizzes/{quiz}/attempts', [QuizAttemptController::class, 'store']);
 });
 
 Route::get('/user', function (Request $request) {
