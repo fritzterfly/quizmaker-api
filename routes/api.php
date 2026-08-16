@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\QuizController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -15,6 +16,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/quizzes/{quiz}', [QuizController::class, 'show']);
     Route::match(['put', 'patch'], '/quizzes/{quiz}', [QuizController::class, 'update']);
     Route::delete('/quizzes/{quiz}', [QuizController::class, 'destroy']);
+
+    Route::get('/quizzes/{quiz}/questions', [QuestionController::class, 'index']);
+    Route::post('/quizzes/{quiz}/questions', [QuestionController::class, 'store']);
+    Route::get('/quizzes/{quiz}/questions/{question}', [QuestionController::class, 'show']);
+    Route::match(['put', 'patch'], '/quizzes/{quiz}/questions/{question}', [QuestionController::class, 'update']);
+    Route::delete('/quizzes/{quiz}/questions/{question}', [QuestionController::class, 'destroy']);
 });
 
 Route::get('/user', function (Request $request) {
