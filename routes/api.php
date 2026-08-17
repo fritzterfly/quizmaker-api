@@ -33,6 +33,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/quizzes/{quiz}/questions/{question}/choices/{choice}', [ChoiceController::class, 'destroy']);
 
     Route::post('/quizzes/{quiz}/attempts', [QuizAttemptController::class, 'store']);
+    Route::post('/attempts/{attempt}/submit', [QuizAttemptController::class, 'submit']);
     Route::post('/attempts/{attempt}/answers', [AttemptAnswerController::class, 'store']);
 });
 
