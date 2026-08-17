@@ -91,4 +91,91 @@ class QuizAttemptController extends Controller
             'completed_at' => $attempt->fresh()->completed_at,
         ]);
     }
+
+    public function index()
+    {
+        $attempts = Auth::user()
+            ->quizAttempts()
+            ->with('quiz:id,title')
+            ->latest()
+            ->get()
+            ->map(function ($attempt) {
+                $percentage = $attempt->total_questions > 0
+                    ? ($attempt->score / $attempt->total_questions) * 100
+                    : 0;
+
+                return [
+                    'id' => $attempt->id,
+                    'quiz_id' => $attempt->quiz_id,
+                    'quiz_title' => $attempt->quiz?->title,
+                    'score' => $attempt->score,
+                    'total_questions' => $attempt->total_questions,
+                    'percentage' => $percentage,
+                    'started_at' => $attempt->started_at,
+                    'completed_at' => $attempt->completed_at,
+                    'status' => $attempt->completed_at ? 'completed' : 'in_progress',
+                ];
+            });
+
+        return response()->json($attempts);
+    }
+
+    public function result(QuizAttempt $attempt)
+    {
+        if ($attempt->user_id !== Auth::id()) {
+            return response()->json([
+                'message' => 'Unauthorized attempt access.',
+            ], 403);
+        }
+
+        if ($attempt->completed_at === null) {
+            return response()->json([
+                'message' => 'This attempt is still in progress.',
+            ], 422);
+        }
+
+        $attempt->load([
+            'quiz:id,title,description',
+            'answers' => function ($query) {
+                $query->with(['question:id,question_text', 'choice:id,choice_text']);
+            },
+        ]);
+
+        $answers = $attempt->answers->map(function ($answer) {
+            $correctChoice = $answer->question?->choices()->where('is_correct', true)->first();
+
+            return [
+                'question_id' => $answer->question_id,
+                'question_text' => $answer->question?->question_text,
+                'selected_choice' => $answer->choice ? [
+                    'id' => $answer->choice->id,
+                    'choice_text' => $answer->choice->choice_text,
+                ] : null,
+                'is_correct' => (bool) $answer->is_correct,
+                'correct_choice' => $correctChoice ? [
+                    'id' => $correctChoice->id,
+                    'choice_text' => $correctChoice->choice_text,
+                ] : null,
+            ];
+        });
+
+        $percentage = $attempt->total_questions > 0
+            ? ($attempt->score / $attempt->total_questions) * 100
+            : 0;
+
+        return response()->json([
+            'id' => $attempt->id,
+            'quiz' => [
+                'id' => $attempt->quiz->id,
+                'title' => $attempt->quiz->title,
+                'description' => $attempt->quiz->description,
+            ],
+            'score' => $attempt->score,
+            'total_questions' => $attempt->total_questions,
+            'percentage' => $percentage,
+            'started_at' => $attempt->started_at,
+            'completed_at' => $attempt->completed_at,
+            'answers' => $answers,
+        ]);
+    }
 }

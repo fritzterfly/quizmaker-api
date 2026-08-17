@@ -32,8 +32,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::match(['put', 'patch'], '/quizzes/{quiz}/questions/{question}/choices/{choice}', [ChoiceController::class, 'update']);
     Route::delete('/quizzes/{quiz}/questions/{question}/choices/{choice}', [ChoiceController::class, 'destroy']);
 
+    Route::get('/attempts', [QuizAttemptController::class, 'index']);
     Route::post('/quizzes/{quiz}/attempts', [QuizAttemptController::class, 'store']);
     Route::post('/attempts/{attempt}/submit', [QuizAttemptController::class, 'submit']);
+    Route::get('/attempts/{attempt}/result', [QuizAttemptController::class, 'result']);
     Route::post('/attempts/{attempt}/answers', [AttemptAnswerController::class, 'store']);
 });
 
