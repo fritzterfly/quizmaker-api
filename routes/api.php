@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AttemptAnswerController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChoiceController;
 use App\Http\Controllers\QuestionController;
@@ -32,6 +33,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/quizzes/{quiz}/questions/{question}/choices/{choice}', [ChoiceController::class, 'destroy']);
 
     Route::post('/quizzes/{quiz}/attempts', [QuizAttemptController::class, 'store']);
+    Route::post('/attempts/{attempt}/answers', [AttemptAnswerController::class, 'store']);
 });
 
 Route::get('/user', function (Request $request) {
